@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 2.6)
 #Name your project here
 project(TicTacToe)
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "bin/bin/bin/")
+
 set( COCOS_ROOT /work/dev/game/cocos )
 set( COCOS_CONF Debug64 )
 set( COCOS_LIBS cocos2d GLEW fmodex64 z cocosdenshion )
@@ -23,12 +25,15 @@ include_directories ( ${COCOS_ROOT}/cocos2dx
 			${COCOS_ROOT}/cocos2dx/include
 			${COCOS_ROOT}/cocos2dx/platform/linux
 			${COCOS_ROOT}/cocos2dx/kazmath/include
+			/usr/include/linux
+			/usr/include/c++/4.6
+		#	/usr/include/c++/4.6/x86_64-linux-gnu
 )
 
 
 set( SRC_FILES 
 	Classes/AppDelegate.cpp
-	Classes/HelloWorldScene.cpp
+	Classes/MonkeyRush.cpp
 	main.cpp
  )
 

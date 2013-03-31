@@ -39,10 +39,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /work/dev/game/TicTacToe
+CMAKE_SOURCE_DIR = /work/dev/game/projects/TicTacToe@TicTacToe
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /work/dev/game/TicTacToe
+CMAKE_BINARY_DIR = /work/dev/game/projects/TicTacToe@TicTacToe
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -69,9 +69,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /work/dev/game/TicTacToe/CMakeFiles /work/dev/game/TicTacToe/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /work/dev/game/projects/TicTacToe@TicTacToe/CMakeFiles /work/dev/game/projects/TicTacToe@TicTacToe/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /work/dev/game/TicTacToe/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /work/dev/game/projects/TicTacToe@TicTacToe/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -135,29 +135,29 @@ Classes/AppDelegate.cpp.s:
 	$(MAKE) -f CMakeFiles/TicTacToe.dir/build.make CMakeFiles/TicTacToe.dir/Classes/AppDelegate.cpp.s
 .PHONY : Classes/AppDelegate.cpp.s
 
-Classes/HelloWorldScene.o: Classes/HelloWorldScene.cpp.o
-.PHONY : Classes/HelloWorldScene.o
+Classes/MonkeyRush.o: Classes/MonkeyRush.cpp.o
+.PHONY : Classes/MonkeyRush.o
 
 # target to build an object file
-Classes/HelloWorldScene.cpp.o:
-	$(MAKE) -f CMakeFiles/TicTacToe.dir/build.make CMakeFiles/TicTacToe.dir/Classes/HelloWorldScene.cpp.o
-.PHONY : Classes/HelloWorldScene.cpp.o
+Classes/MonkeyRush.cpp.o:
+	$(MAKE) -f CMakeFiles/TicTacToe.dir/build.make CMakeFiles/TicTacToe.dir/Classes/MonkeyRush.cpp.o
+.PHONY : Classes/MonkeyRush.cpp.o
 
-Classes/HelloWorldScene.i: Classes/HelloWorldScene.cpp.i
-.PHONY : Classes/HelloWorldScene.i
+Classes/MonkeyRush.i: Classes/MonkeyRush.cpp.i
+.PHONY : Classes/MonkeyRush.i
 
 # target to preprocess a source file
-Classes/HelloWorldScene.cpp.i:
-	$(MAKE) -f CMakeFiles/TicTacToe.dir/build.make CMakeFiles/TicTacToe.dir/Classes/HelloWorldScene.cpp.i
-.PHONY : Classes/HelloWorldScene.cpp.i
+Classes/MonkeyRush.cpp.i:
+	$(MAKE) -f CMakeFiles/TicTacToe.dir/build.make CMakeFiles/TicTacToe.dir/Classes/MonkeyRush.cpp.i
+.PHONY : Classes/MonkeyRush.cpp.i
 
-Classes/HelloWorldScene.s: Classes/HelloWorldScene.cpp.s
-.PHONY : Classes/HelloWorldScene.s
+Classes/MonkeyRush.s: Classes/MonkeyRush.cpp.s
+.PHONY : Classes/MonkeyRush.s
 
 # target to generate assembly for a file
-Classes/HelloWorldScene.cpp.s:
-	$(MAKE) -f CMakeFiles/TicTacToe.dir/build.make CMakeFiles/TicTacToe.dir/Classes/HelloWorldScene.cpp.s
-.PHONY : Classes/HelloWorldScene.cpp.s
+Classes/MonkeyRush.cpp.s:
+	$(MAKE) -f CMakeFiles/TicTacToe.dir/build.make CMakeFiles/TicTacToe.dir/Classes/MonkeyRush.cpp.s
+.PHONY : Classes/MonkeyRush.cpp.s
 
 main.o: main.cpp.o
 .PHONY : main.o
@@ -195,9 +195,9 @@ help:
 	@echo "... Classes/AppDelegate.o"
 	@echo "... Classes/AppDelegate.i"
 	@echo "... Classes/AppDelegate.s"
-	@echo "... Classes/HelloWorldScene.o"
-	@echo "... Classes/HelloWorldScene.i"
-	@echo "... Classes/HelloWorldScene.s"
+	@echo "... Classes/MonkeyRush.o"
+	@echo "... Classes/MonkeyRush.i"
+	@echo "... Classes/MonkeyRush.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

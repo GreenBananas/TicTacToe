@@ -1,4 +1,4 @@
-# Install script for directory: /work/dev/game/TicTacToe
+# Install script for directory: /work/dev/game/projects/TicTacToe@TicTacToe
 
 # Set the install prefix
 IF(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -38,7 +38,7 @@ ELSE(CMAKE_INSTALL_COMPONENT)
   SET(CMAKE_INSTALL_MANIFEST "install_manifest.txt")
 ENDIF(CMAKE_INSTALL_COMPONENT)
 
-FILE(WRITE "/work/dev/game/TicTacToe/${CMAKE_INSTALL_MANIFEST}" "")
+FILE(WRITE "/work/dev/game/projects/TicTacToe@TicTacToe/${CMAKE_INSTALL_MANIFEST}" "")
 FOREACH(file ${CMAKE_INSTALL_MANIFEST_FILES})
-  FILE(APPEND "/work/dev/game/TicTacToe/${CMAKE_INSTALL_MANIFEST}" "${file}\n")
+  FILE(APPEND "/work/dev/game/projects/TicTacToe@TicTacToe/${CMAKE_INSTALL_MANIFEST}" "${file}\n")
 ENDFOREACH(file)

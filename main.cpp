@@ -1,10 +1,12 @@
 #include "Classes/AppDelegate.h"
 #include "cocos2d.h"
 
+#include <cstddef>
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <string>
+
 
 USING_NS_CC;
 
