@@ -23,8 +23,16 @@ public:
     void menuCloseCallback(CCObject* pSender);
     void onDialogOKPress(CCObject* pSender);
 
+    void ccTouchesEnded(cocos2d::CCSet* touches, cocos2d::CCEvent* event);
+
     // implement the "static node()" method manually
     CREATE_FUNC(MonkeyRush);
+
+protected:
+    cocos2d::CCSprite* pDialogBox;
+    cocos2d::CCMenuItemImage *pOKDialog;
+
+
 };
 
 #endif /* MONKEYRUSH_H_ */

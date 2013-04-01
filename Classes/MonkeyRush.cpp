@@ -7,6 +7,7 @@
 
 #include "MonkeyRush.h"
 #include "AppMacros.h"
+#include "TouchableSprite.h"
 
 #include <vector>
 #include <string>
@@ -41,10 +42,10 @@ bool MonkeyRush::init()
     CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
     CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
 
-    CCFileUtils* pFileUtils = CCFileUtils::sharedFileUtils();
-    std::vector<std::string> searchPaths;
-    searchPaths.push_back( "./Resources" );
-    pFileUtils->setSearchPaths( searchPaths );
+//    CCFileUtils* pFileUtils = CCFileUtils::sharedFileUtils();
+//    std::vector<std::string> searchPaths;
+//    searchPaths.push_back( "./Resources/" );
+//    pFileUtils->setSearchPaths( searchPaths );
 
     /////////////////////////////
     // 2. add a menu item with "X" image, which is clicked to quit the program
@@ -70,7 +71,7 @@ bool MonkeyRush::init()
 
     // add a label shows "Hello World"
     // create and initialize a label
-
+    CCLog("Trying log ....");
     CCLabelTTF* pLabel = CCLabelTTF::create("MonkeyRush", "Arial", TITLE_FONT_SIZE);
 
     // position the label on the center of the screen
@@ -81,7 +82,7 @@ bool MonkeyRush::init()
     this->addChild(pLabel, 1);
 
     // add "HelloWorld" splash screen"
-    CCSprite* pSprite = CCSprite::create("HelloWorld.png");
+    CCSprite* pSprite = CCSprite::create("BlackBackground.png");
 
     // position the sprite on the center of the screen
     pSprite->setPosition(ccp(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
@@ -89,18 +90,51 @@ bool MonkeyRush::init()
     // add the sprite as a child to this layer
     this->addChild(pSprite, 0);
 
-    CCSprite* pDialogBox = CCSprite::create("GreetingDialog.png");
-    pDialogBox->setPosition( ccp(visibleSize.width/2 + origin.x, (visibleSize.height*0.80) + origin.y) );
+    this->pDialogBox = CCSprite::create("GreetingDialog.png");
+    this->pDialogBox->setPosition( ccp(visibleSize.width/2 + origin.x, (visibleSize.height*0.50) + origin.y) );
 
-    CCMenuItemImage *pOKDialog = CCMenuItemImage::create( "OkButton.png", "OkButton.png", this, menu_selector(MonkeyRush::onDialogOKPress) );
-    pOKDialog->setPosition( ccp(pDialogBox->getPositionX(), pOKDialog->getPositionY() ) );
+    this->pOKDialog = CCMenuItemImage::create( "OkButton.png", "OkButton.png", this, menu_selector(MonkeyRush::onDialogOKPress) );
+    this->pOKDialog->setPosition( ccp(pDialogBox->getPositionX(), pDialogBox->getTextureRect().getMidY() ) );
 
-    this->addChild( pDialogBox, 2);
-    this->addChild( pOKDialog, 2);
+    this->addChild( this->pDialogBox, 2);
+    this->addChild( this->pOKDialog, 3);
+
+    this->setTouchEnabled(true);
+
+    //this->schedule( schedule_selector(HelloWorld::updateGame) );
+    CCDirector::sharedDirector()->getTouchDispatcher()->addStandardDelegate(this,0);
+
+//    this->schedule( schedule_selector(HelloWorld::gameLogic), 1.0 );
+//
+//	this->setTouchEnabled(true);
+//
+//	_targets = new CCArray;
+//	_projectiles = new CCArray;
+//
+//	// use updateGame instead of update, otherwise it will conflit with SelectorProtocol::update
+//	// see http://www.cocos2d-x.org/boards/6/topics/1478
+//	this->schedule( schedule_selector(HelloWorld::updateGame) );
+
+	//CocosDenshion::SimpleAudioEngine::sharedEngine()->playBackgroundMusic("background-music-aac.wav", true);
+
 
     return true;
 }
 
+
+void MonkeyRush::ccTouchesEnded(CCSet* touches, CCEvent* event)
+{
+	CCLog("Got some touch!");
+
+	if( this->pDialogBox != NULL )
+	{
+		this->removeChild(this->pOKDialog, true);
+		this->removeChild(this->pDialogBox, true);
+
+		this->pDialogBox = NULL;
+		this->pOKDialog = NULL;
+	}
+}
 
 void MonkeyRush::menuCloseCallback(CCObject* pSender)
 {

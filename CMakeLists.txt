@@ -6,6 +6,8 @@ project(TicTacToe)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "bin/bin/bin/")
 
 set( COCOS_ROOT /work/dev/game/cocos )
+set( COCOS_SRC_ROOT /work/dev/game/cocos/cocos2dx )
+
 set( COCOS_CONF Debug64 )
 set( COCOS_LIBS cocos2d GLEW fmodex64 z cocosdenshion )
 
@@ -21,17 +23,19 @@ link_directories ( ${COCOS_ROOT}/cocos2dx/proj.linux/${COCOS_CONF}
 
 
 add_definitions( -DLINUX ) #Needes by COCOS include files to select platform specific files
-include_directories ( ${COCOS_ROOT}/cocos2dx
-			${COCOS_ROOT}/cocos2dx/include
-			${COCOS_ROOT}/cocos2dx/platform/linux
-			${COCOS_ROOT}/cocos2dx/kazmath/include
-			/usr/include/linux
+include_directories ( ${COCOS_SRC_ROOT}
+			${COCOS_SRC_ROOT}/include
+			${COCOS_SRC_ROOT}/platform/linux
+			${COCOS_SRC_ROOT}/kazmath/include
+			${COCOS_SRC_ROOT}/touch_dispatcher
+			${COCOS_SRC_ROOT}/sprite_nodes
 			/usr/include/c++/4.6
-		#	/usr/include/c++/4.6/x86_64-linux-gnu
+			/usr/include
 )
 
 
-set( SRC_FILES 
+set( SRC_FILES
+    #Classes/TouchableSprite.cpp
 	Classes/AppDelegate.cpp
 	Classes/MonkeyRush.cpp
 	main.cpp
