@@ -29,8 +29,13 @@ public:
     CREATE_FUNC(MonkeyRush);
 
 protected:
-    cocos2d::CCSprite* pDialogBox;
-    cocos2d::CCMenuItemImage *pOKDialog;
+    cocos2d::CCSprite* 			pDialogBox;
+    cocos2d::CCMenuItemImage*	pOKDialog;
+
+    cocos2d::CCSize		visibleSize;
+    cocos2d::CCPoint	origin;
+
+    void _startTheGame();
 
 
 };

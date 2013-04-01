@@ -39,8 +39,8 @@ bool MonkeyRush::init()
         return false;
     }
 
-    CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
-    CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
+    this->visibleSize = CCDirector::sharedDirector()->getVisibleSize();
+    this->origin = CCDirector::sharedDirector()->getVisibleOrigin();
 
 //    CCFileUtils* pFileUtils = CCFileUtils::sharedFileUtils();
 //    std::vector<std::string> searchPaths;
@@ -94,7 +94,7 @@ bool MonkeyRush::init()
     this->pDialogBox->setPosition( ccp(visibleSize.width/2 + origin.x, (visibleSize.height*0.50) + origin.y) );
 
     this->pOKDialog = CCMenuItemImage::create( "OkButton.png", "OkButton.png", this, menu_selector(MonkeyRush::onDialogOKPress) );
-    this->pOKDialog->setPosition( ccp(pDialogBox->getPositionX(), pDialogBox->getTextureRect().getMidY() ) );
+    this->pOKDialog->setPosition( ccp(pDialogBox->getPositionX(), pDialogBox->boundingBox().getMinY() ) );
 
     this->addChild( this->pDialogBox, 2);
     this->addChild( this->pOKDialog, 3);
@@ -104,7 +104,7 @@ bool MonkeyRush::init()
     //this->schedule( schedule_selector(HelloWorld::updateGame) );
     CCDirector::sharedDirector()->getTouchDispatcher()->addStandardDelegate(this,0);
 
-//    this->schedule( schedule_selector(HelloWorld::gameLogic), 1.0 );
+//
 //
 //	this->setTouchEnabled(true);
 //
@@ -126,6 +126,7 @@ void MonkeyRush::ccTouchesEnded(CCSet* touches, CCEvent* event)
 {
 	CCLog("Got some touch!");
 
+	// First touch will remove the Dialog and the game can start
 	if( this->pDialogBox != NULL )
 	{
 		this->removeChild(this->pOKDialog, true);
@@ -133,7 +134,24 @@ void MonkeyRush::ccTouchesEnded(CCSet* touches, CCEvent* event)
 
 		this->pDialogBox = NULL;
 		this->pOKDialog = NULL;
+
+		this->_startTheGame();
 	}
+}
+
+void MonkeyRush :: _startTheGame()
+{
+//	this->schedule( schedule_selector(HelloWorld::gameLogic), 1.0 );
+//	this->schedule( schedule_selector(HelloWorld::updateGame) );
+
+	CCLog("Starting the game ...");
+
+	CCSprite* firstMonkey = CCSprite::create("monkey.png");
+	if( !firstMonkey->isVisible() )
+		CCLog("Loading sprite failed!");
+
+	firstMonkey->setPosition( ccp( this->visibleSize.width/2 + this->origin.x, this->origin.y + (firstMonkey->boundingBox().size.height / 2) ) );
+	this->addChild( firstMonkey, 2);
 }
 
 void MonkeyRush::menuCloseCallback(CCObject* pSender)
