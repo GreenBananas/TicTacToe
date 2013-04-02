@@ -7,7 +7,6 @@
 
 #include "MonkeyRush.h"
 #include "AppMacros.h"
-#include "TouchableSprite.h"
 
 #include <vector>
 #include <string>
@@ -93,16 +92,25 @@ bool MonkeyRush::init()
     this->pDialogBox = CCSprite::create("GreetingDialog.png");
     this->pDialogBox->setPosition( ccp(visibleSize.width/2 + origin.x, (visibleSize.height*0.50) + origin.y) );
 
-    this->pOKDialog = CCMenuItemImage::create( "OkButton.png", "OkButton.png", this, menu_selector(MonkeyRush::onDialogOKPress) );
+    this->pOKDialog = CCSprite::create( "OkButton.png" );
     this->pOKDialog->setPosition( ccp(pDialogBox->getPositionX(), pDialogBox->boundingBox().getMinY() ) );
 
     this->addChild( this->pDialogBox, 2);
     this->addChild( this->pOKDialog, 3);
 
+    this->_climbingMonkeySprite = CCSprite::create("climingMonkey.png");
+    //Note: stupid hack, if not done, the texture of the sprite can not be used;Probably because of optimization its not loaded before setting it
+    this->addChild( this->_climbingMonkeySprite, -1);
+    this->_monkeys = new CCArray;
+
+    //this->setTouchMode( kCCTouchesAllAtOnce );
     this->setTouchEnabled(true);
 
     //this->schedule( schedule_selector(HelloWorld::updateGame) );
-    CCDirector::sharedDirector()->getTouchDispatcher()->addStandardDelegate(this,0);
+    //CCDirector::sharedDirector()->getTouchDispatcher()->addStandardDelegate(this,0);
+    //this->registerWithTouchDispatcher();
+
+    //Preload the climing monkey sprite
 
 //
 //
@@ -124,7 +132,7 @@ bool MonkeyRush::init()
 
 void MonkeyRush::ccTouchesEnded(CCSet* touches, CCEvent* event)
 {
-	CCLog("Got some touch!");
+	CCTouch* pTouch = (CCTouch*)( touches->anyObject() );
 
 	// First touch will remove the Dialog and the game can start
 	if( this->pDialogBox != NULL )
@@ -136,6 +144,10 @@ void MonkeyRush::ccTouchesEnded(CCSet* touches, CCEvent* event)
 		this->pOKDialog = NULL;
 
 		this->_startTheGame();
+	}
+	else
+	{
+		this->_addNewMonkey( pTouch->getLocation() );
 	}
 }
 
@@ -154,18 +166,21 @@ void MonkeyRush :: _startTheGame()
 	this->addChild( firstMonkey, 2);
 }
 
+void MonkeyRush :: _addNewMonkey( CCPoint positon )
+{
+	CCLog("Will try to add new monkey to [%f %f]", positon.x, positon.y );
+
+	CCTexture2D* tex = this->_climbingMonkeySprite->getTexture();
+	CCSprite* nMonkey = CCSprite::createWithTexture( tex );
+	nMonkey->setPosition( positon );
+	this->addChild( nMonkey, 2);
+	this->_monkeys->addObject( nMonkey );
+}
+
 void MonkeyRush::menuCloseCallback(CCObject* pSender)
 {
     CCDirector::sharedDirector()->end();
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-    exit(0);
-#endif
-}
-
-void MonkeyRush::onDialogOKPress(CCObject* pSender)
-{
-	printf("Pressing OK!");
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
     exit(0);
 #endif

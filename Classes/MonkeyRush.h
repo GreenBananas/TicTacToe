@@ -21,21 +21,26 @@ public:
 
     // a selector callback
     void menuCloseCallback(CCObject* pSender);
-    void onDialogOKPress(CCObject* pSender);
 
+    //bool ccTouchBegan(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent);
     void ccTouchesEnded(cocos2d::CCSet* touches, cocos2d::CCEvent* event);
+    //void ccTouchEnded(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent);
 
     // implement the "static node()" method manually
     CREATE_FUNC(MonkeyRush);
 
 protected:
-    cocos2d::CCSprite* 			pDialogBox;
-    cocos2d::CCMenuItemImage*	pOKDialog;
+    cocos2d::CCSprite* 	pDialogBox;
+    cocos2d::CCSprite*	pOKDialog;
+
+    cocos2d::CCSprite* _climbingMonkeySprite;
+    cocos2d::CCArray*	_monkeys;
 
     cocos2d::CCSize		visibleSize;
     cocos2d::CCPoint	origin;
 
     void _startTheGame();
+    void _addNewMonkey( cocos2d::CCPoint positon );
 
 
 };
