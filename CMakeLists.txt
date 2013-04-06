@@ -1,3 +1,4 @@
+#Build Eclipse Project with cmake -G "Eclipse CDT4 - Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug
 #Specify the version being used aswell as the language
 cmake_minimum_required(VERSION 2.6)
 #Name your project here
@@ -29,6 +30,8 @@ include_directories ( ${COCOS_SRC_ROOT}
 			${COCOS_SRC_ROOT}/kazmath/include
 			${COCOS_SRC_ROOT}/touch_dispatcher
 			${COCOS_SRC_ROOT}/sprite_nodes
+			${COCOS_SRC_ROOT}/draw_nodes
+			${COCOS_SRC_ROOT}/cocoa
 			/usr/include/c++/4.6
 			/usr/include
 )

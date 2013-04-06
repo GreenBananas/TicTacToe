@@ -61,8 +61,8 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
         pDirector->setContentScaleFactor(MIN(smallResource.size.height/designResolutionSize.height, smallResource.size.width/designResolutionSize.width));
     }
-    
-    // set searching path
+
+	//pDirector->setContentScaleFactor( 1.0 );
     CCFileUtils::sharedFileUtils()->setSearchPaths(searchPath);
 	
     // turn on display FPS

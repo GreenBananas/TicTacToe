@@ -16,7 +16,7 @@ int main(int argc, char **argv)
     AppDelegate app;
 
     CCEGLView* eglView = CCEGLView::sharedOpenGLView();
-    eglView->setFrameSize(480, 800);
+    eglView->setFrameSize(600, 800);
 
     return CCApplication::sharedApplication()->run();
 }
