@@ -21,7 +21,7 @@ public:
 	static const int GridHeight 	= 6;
 
 
-	typedef enum _TildState { EMPTY, MONKEY, FIRE } TildState;
+	typedef enum _TildState { EMPTY, MONKEY, FIRE, INVALID } TildState;
 	typedef struct { unsigned int x; unsigned int y; } GridPos;
 
     // Here's a difference. Method 'init' in cocos2d-x returns bool, instead of returning 'id' in cocos2d-iphone
@@ -47,7 +47,12 @@ protected:
     cocos2d::CCSprite*	pOKDialog;
 
     cocos2d::CCSprite* _climbingMonkeySprite;
+    cocos2d::CCSprite* _TreeFireSprite;
+    cocos2d::CCSprite* _WinDialog;
+    cocos2d::CCSprite* _LoseDialog;
     cocos2d::CCArray*	_monkeys;
+    cocos2d::CCArray*	_TreeFires;
+
 
     cocos2d::CCSize		visibleSize;
     cocos2d::CCPoint	origin;
@@ -61,6 +66,15 @@ protected:
     void _setCellState( GridPos cell, TildState state);
     MonkeyRush::TildState _getCellState( GridPos cell );
     bool _logic_testValidMonkeyCell( GridPos cell );
+    void _logic_SpawnNewTreeFire( );
+    bool _logic_checkWinCondition();
+    bool _logic_checkLoosCondition();
+
+    void _Win();
+    void _Lose();
+    void _resetGame();
+
+
 
     TildState grid[GridWidth][GridHeight];
 

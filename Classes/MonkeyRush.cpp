@@ -126,6 +126,21 @@ void MonkeyRush::_loadScene()
 	this->addChild( this->_climbingMonkeySprite, -1);
 	this->_monkeys = new CCArray;
 
+	this->_TreeFireSprite = CCSprite::create("fire2.png");
+	//Note: stupid hack, if not done, the texture of the sprite can not be used;Probably because of optimization its not loaded before setting it
+	this->addChild( this->_TreeFireSprite, -1);
+	this->_TreeFires =  new CCArray;
+
+	this->_WinDialog = CCSprite::create("WinDialog.png");
+	this->_WinDialog->setPosition( ccp(visibleSize.width/2 + origin.x, (visibleSize.height*0.50) + origin.y) );
+	this->addChild( this->_WinDialog, 2);
+	this->_WinDialog->setVisible( false );
+
+	this->_LoseDialog = CCSprite::create("LoseDialog.png");
+	this->_LoseDialog->setPosition( ccp(visibleSize.width/2 + origin.x, (visibleSize.height*0.50) + origin.y) );
+	this->addChild( this->_LoseDialog, 2);
+	this->_LoseDialog->setVisible( false );
+
 	//this->setTouchMode( kCCTouchesAllAtOnce );
 
 	this->setTouchEnabled(true);
@@ -133,6 +148,8 @@ void MonkeyRush::_loadScene()
 
 void MonkeyRush::ccTouchesEnded(CCSet* touches, CCEvent* event)
 {
+	static bool resetGameOnTouch = false;
+
 	CCTouch* pTouch = (CCTouch*)( touches->anyObject() );
 
 	// First touch will remove the Dialog and the game can start
@@ -148,7 +165,25 @@ void MonkeyRush::ccTouchesEnded(CCSet* touches, CCEvent* event)
 	}
 	else
 	{
-		this->_addNewMonkey( pTouch->getLocation() );
+		if( resetGameOnTouch )
+		{
+			this->_resetGame();
+			resetGameOnTouch = false;
+		}
+		else
+		{
+			this->_addNewMonkey( pTouch->getLocation() );
+			if ( this->_logic_checkWinCondition( ) ){
+				this->_Win();
+				resetGameOnTouch = true;
+			} else	if( this->_logic_checkLoosCondition( ) ){
+				this->_Lose();
+				resetGameOnTouch = true;
+			} else {
+				// If not, just spawn a fire
+				this->_logic_SpawnNewTreeFire();
+			}
+		}
 	}
 }
 
@@ -173,8 +208,11 @@ void MonkeyRush :: _startTheGame()
 	if( !firstMonkey->isVisible() )
 		CCLog("Loading sprite failed!");
 
-	firstMonkey->setPosition( ccp( this->visibleSize.width/2 + this->origin.x, this->origin.y + (firstMonkey->boundingBox().size.height / 2) ) );
+	CCPoint posFirstMonkey = CCPoint( this->visibleSize.width/2 + this->origin.x, this->origin.y + (firstMonkey->boundingBox().size.height / 2) );
+	firstMonkey->setPosition( posFirstMonkey );
 	this->addChild( firstMonkey, 2);
+	GridPos gp = this->_Position2GridCell( posFirstMonkey.x, posFirstMonkey.y );
+	this->_setCellState( gp, MONKEY );
 
 }
 
@@ -237,13 +275,127 @@ void MonkeyRush::_setCellState( GridPos cell, TildState state)
 
 MonkeyRush::TildState MonkeyRush::_getCellState( GridPos cell )
 {
-	return this->grid[ cell.x ][ cell.y ];
+	if( (cell.x >= 0 ) &&  (cell.x < MonkeyRush::GridWidth ) && (cell.y >= 0 ) &&  (cell.y < MonkeyRush::GridHeight ) )
+		return this->grid[ cell.x ][ cell.y ];
+	else
+		return INVALID;
 }
 
 bool MonkeyRush::_logic_testValidMonkeyCell( GridPos cell )
 {
 	if ( this->_getCellState( cell ) == EMPTY )
-		return true;
-	else
-		return false;
+	{
+		//Only if one of the neighboring cell contains a monkey
+		if( this->_getCellState( {cell.x - 1, cell.y} ) == MONKEY )
+			return true;
+		if( this->_getCellState( {cell.x + 1, cell.y} ) == MONKEY )
+			return true;
+
+		if( this->_getCellState( {cell.x, cell.y - 1} ) == MONKEY )
+			return true;
+		if( this->_getCellState( {cell.x, cell.y + 1} ) == MONKEY )
+			return true;
+
+		if( this->_getCellState( {cell.x - 1, cell.y - 1} ) == MONKEY )
+			return true;
+		if( this->_getCellState( {cell.x - 1, cell.y + 1} ) == MONKEY )
+			return true;
+
+		if( this->_getCellState( {cell.x + 1, cell.y - 1} ) == MONKEY )
+			return true;
+		if( this->_getCellState( {cell.x + 1, cell.y + 1} ) == MONKEY )
+			return true;
+	}
+
+	return false;
+}
+
+void MonkeyRush::_logic_SpawnNewTreeFire( )
+{
+	bool setFire = false;
+	GridPos cell;
+
+	if ( this->_logic_checkLoosCondition() == true )
+		return; //If there is no free cell left dont try to set a tree fire
+
+	do{
+		cell = { rand() % this->GridWidth , rand() % this->GridHeight };
+		if( this->_getCellState( cell ) == EMPTY )
+		{
+			this->_setCellState( cell, FIRE );
+			CCPoint cellCenter = this->_getCellCenter( cell );
+
+			CCLog("Setting new Tree Fire to cell [%d %d] pos [%f %f]", cell.x, cell.y, cellCenter.x, cellCenter.y );
+
+			CCTexture2D* tex = this->_TreeFireSprite->getTexture();
+			CCSprite* treeFire = CCSprite::createWithTexture( tex );
+			treeFire->setScale( 0.5 );
+			treeFire->setPosition( cellCenter );
+			this->addChild( treeFire, 2);
+			this->_TreeFires->addObject( treeFire );
+
+			setFire = true;
+		}
+	}	while( !setFire );
+
+}
+
+bool MonkeyRush::_logic_checkWinCondition()
+{
+	//If there is a monkey on the top row the player won
+	for(int i=0; i < MonkeyRush::GridWidth; i++){
+		if( this->_getCellState( {i, MonkeyRush::GridHeight-1} ) == MONKEY )
+			return true;
+	}
+	return false;
+}
+
+bool MonkeyRush::_logic_checkLoosCondition()
+{
+	// When there is no free tile left, the user lost
+	for(int i=0; i < MonkeyRush::GridWidth; i++){
+		for(int j=0; j < MonkeyRush::GridHeight; j++){
+			if( this->_getCellState( {i, j} ) == EMPTY )
+				return false;
+		}
+	}
+	return true;
+}
+
+void MonkeyRush::_Win()
+{
+	CCLog( "Player won the game!!!" );
+	this->_WinDialog->setVisible( true );
+}
+
+void MonkeyRush::_Lose()
+{
+	CCLog( "Player lost the game!!! ");
+	this->_LoseDialog->setVisible( true );
+}
+
+void MonkeyRush::_resetGame()
+{
+	CCLog( "Reseting the game ..." );
+	while( this->_TreeFires->count() > 0){
+		CCNode* p =  (CCNode*) this->_TreeFires->lastObject() ;
+		this->_TreeFires->removeLastObject( );
+		this->removeChild( p , true);
+
+	}
+	while( this->_monkeys->count() > 0){
+		CCNode* p = (CCNode*) this->_monkeys->lastObject();
+		this->_monkeys->removeLastObject( );
+		this->removeChild( p , true);
+
+	}
+
+	for(int i=0; i < MonkeyRush::GridWidth; i++){
+		for(int j=0; j < MonkeyRush::GridHeight; j++){
+			this->_setCellState( {i, j} , EMPTY );
+		}
+	}
+
+	this->_WinDialog->setVisible( false );
+	this->_LoseDialog->setVisible( false );
 }
