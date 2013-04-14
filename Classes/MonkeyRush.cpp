@@ -56,12 +56,6 @@ bool MonkeyRush::init()
 
 void MonkeyRush::_initGame()
 {
-	for(int i=0; i < MonkeyRush::GridWidth ; i++){
-		for(int j=0; j < MonkeyRush::GridHeight; j++){
-			this->grid[i][j] = MonkeyRush::EMPTY;
-		}
-	}
-
 	float w = this->visibleSize.width;
 	float h = this->visibleSize.height;
 
@@ -70,6 +64,7 @@ void MonkeyRush::_initGame()
 	this->cw = w / MonkeyRush::GridWidth;
 	this->ch = h / MonkeyRush::GridHeight;
 
+	this->_initVariables();
 }
 
 void MonkeyRush::_loadScene()
@@ -141,6 +136,15 @@ void MonkeyRush::_loadScene()
 	this->addChild( this->_LoseDialog, 2);
 	this->_LoseDialog->setVisible( false );
 
+	CCMenuItemImage *fireMonkeyButton = CCMenuItemImage::create( "Fireman_monkey.png", "Fireman_monkey.png", this, menu_selector(MonkeyRush::onFireManMonkeyClick));
+	fireMonkeyButton->setScale( 0.5 );
+	fireMonkeyButton->setPosition(ccp(origin.x + ( fireMonkeyButton->getContentSize().width*fireMonkeyButton->getScale() ) /2 ,	origin.y + (fireMonkeyButton->getContentSize().height*fireMonkeyButton->getScale())/2));
+	//fireMonkeyButton->setPosition(ccp(origin.x , origin.y));
+	this->addChild(fireMonkeyButton, 1);
+	CCMenu* t1 = CCMenu::create(fireMonkeyButton, NULL);
+	t1->setPosition(CCPointZero);
+	this->addChild(t1, 1);
+
 	//this->setTouchMode( kCCTouchesAllAtOnce );
 
 	this->setTouchEnabled(true);
@@ -148,41 +152,44 @@ void MonkeyRush::_loadScene()
 
 void MonkeyRush::ccTouchesEnded(CCSet* touches, CCEvent* event)
 {
-	static bool resetGameOnTouch = false;
-
 	CCTouch* pTouch = (CCTouch*)( touches->anyObject() );
 
-	// First touch will remove the Dialog and the game can start
-	if( this->pDialogBox != NULL )
+	switch ( this->getClickState() )
 	{
-		this->removeChild(this->pOKDialog, true);
-		this->removeChild(this->pDialogBox, true);
+		case MonkeyRush::INITIAL_DIALOG:{
+			this->removeChild(this->pOKDialog, true);
+			this->removeChild(this->pDialogBox, true);
 
-		this->pDialogBox = NULL;
-		this->pOKDialog = NULL;
+			this->pDialogBox = NULL;
+			this->pOKDialog = NULL;
 
-		this->_startTheGame();
-	}
-	else
-	{
-		if( resetGameOnTouch )
-		{
-			this->_resetGame();
-			resetGameOnTouch = false;
+			this->_startTheGame();
+			break;
 		}
-		else
-		{
+		case MonkeyRush::MONKEY_CLICK:{
+
 			this->_addNewMonkey( pTouch->getLocation() );
 			if ( this->_logic_checkWinCondition( ) ){
 				this->_Win();
-				resetGameOnTouch = true;
+				this->setClickState( MonkeyRush::RESET_GAME );
 			} else	if( this->_logic_checkLoosCondition( ) ){
 				this->_Lose();
-				resetGameOnTouch = true;
+				this->setClickState( MonkeyRush::RESET_GAME );
 			} else {
 				// If not, just spawn a fire
 				this->_logic_SpawnNewTreeFire();
 			}
+
+			break;
+		}
+		case MonkeyRush::FIREMONKEY:{
+			this->_extinguishFire( pTouch->getLocation() );
+			this->setClickState( MonkeyRush::MONKEY_CLICK );
+			break;
+		}
+		case MonkeyRush::RESET_GAME:{
+			this->_resetGame();
+			break;
 		}
 	}
 }
@@ -214,6 +221,8 @@ void MonkeyRush :: _startTheGame()
 	GridPos gp = this->_Position2GridCell( posFirstMonkey.x, posFirstMonkey.y );
 	this->_setCellState( gp, MONKEY );
 
+	this->setClickState( MonkeyRush::MONKEY_CLICK );
+
 }
 
 void MonkeyRush :: _addNewMonkey( CCPoint positon )
@@ -235,11 +244,34 @@ void MonkeyRush :: _addNewMonkey( CCPoint positon )
 		CCTexture2D* tex = this->_climbingMonkeySprite->getTexture();
 		CCSprite* nMonkey = CCSprite::createWithTexture( tex );
 		nMonkey->setPosition( cellCenter );
+		nMonkey->setScale( 0.5 );
 		this->addChild( nMonkey, 2);
-		this->_monkeys->addObject( nMonkey );
+		//this->_monkeys->addObject( nMonkey );
+		this->gridReferences[cell.x][cell.y] = nMonkey;
+
 	} else {
 		CCLog("Logic says no monkey here!");
 	}
+}
+
+void MonkeyRush :: _extinguishFire( CCPoint positon )
+{
+	GridPos cell;
+
+	cell = this->_Position2GridCell( positon.x, positon.y );
+
+	CCLog("Remove Fire from cell [%d %d]", cell.x, cell.y );
+
+	if( this->_getCellState( cell ) == MonkeyRush::FIRE )
+	{
+		this->_setCellState( cell, EMPTY );
+		this->removeChild( (CCNode*) this->gridReferences[cell.x][cell.y] , true);
+		this->gridReferences[cell.x][cell.y] = NULL;
+	} else {
+		CCLog("Logic says no fire here!");
+	}
+
+	this->nFireMonkeys--;
 }
 
 void MonkeyRush::menuCloseCallback(CCObject* pSender)
@@ -249,6 +281,16 @@ void MonkeyRush::menuCloseCallback(CCObject* pSender)
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
     exit(0);
 #endif
+}
+
+void MonkeyRush::onFireManMonkeyClick( CCObject* pSender )
+{
+	if( this->nFireMonkeys == 0){
+			CCLog("No Fire monkeys left :(");
+	}else {
+		CCLog("Firemonkey go go go ...");
+		this->setClickState( MonkeyRush::FIREMONKEY );
+	}
 }
 
 MonkeyRush::GridPos MonkeyRush::_Position2GridCell ( float x, float y )
@@ -332,8 +374,8 @@ void MonkeyRush::_logic_SpawnNewTreeFire( )
 			treeFire->setScale( 0.5 );
 			treeFire->setPosition( cellCenter );
 			this->addChild( treeFire, 2);
-			this->_TreeFires->addObject( treeFire );
-
+			//this->_TreeFires->addObject( treeFire );
+			this->gridReferences[cell.x][cell.y] = treeFire;
 			setFire = true;
 		}
 	}	while( !setFire );
@@ -377,25 +419,44 @@ void MonkeyRush::_Lose()
 void MonkeyRush::_resetGame()
 {
 	CCLog( "Reseting the game ..." );
-	while( this->_TreeFires->count() > 0){
-		CCNode* p =  (CCNode*) this->_TreeFires->lastObject() ;
-		this->_TreeFires->removeLastObject( );
-		this->removeChild( p , true);
-
-	}
-	while( this->_monkeys->count() > 0){
-		CCNode* p = (CCNode*) this->_monkeys->lastObject();
-		this->_monkeys->removeLastObject( );
-		this->removeChild( p , true);
-
-	}
+//	while( this->_TreeFires->count() > 0){
+//		CCNode* p =  (CCNode*) this->_TreeFires->lastObject() ;
+//		this->_TreeFires->removeLastObject( );
+//		this->removeChild( p , true);
+//
+//	}
+//	while( this->_monkeys->count() > 0){
+//		CCNode* p = (CCNode*) this->_monkeys->lastObject();
+//		this->_monkeys->removeLastObject( );
+//		this->removeChild( p , true);
+//
+//	}
 
 	for(int i=0; i < MonkeyRush::GridWidth; i++){
 		for(int j=0; j < MonkeyRush::GridHeight; j++){
-			this->_setCellState( {i, j} , EMPTY );
+			if( this->gridReferences[i][j] != NULL ){
+				this->removeChild( (CCNode*) this->gridReferences[i][j] , true);
+				this->gridReferences[i][j] = NULL;
+			}
 		}
 	}
 
+	this->_initVariables();
+
 	this->_WinDialog->setVisible( false );
 	this->_LoseDialog->setVisible( false );
+}
+
+void MonkeyRush::_initVariables()
+{
+	for(int i=0; i < MonkeyRush::GridWidth; i++){
+		for(int j=0; j < MonkeyRush::GridHeight; j++){
+			this->_setCellState( {i, j} , EMPTY );
+			this->gridReferences[i][j] = NULL;
+		}
+	}
+
+	this->nFireMonkeys = 3;
+
+	this->currentClickState = INITIAL_DIALOG;
 }

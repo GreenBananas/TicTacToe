@@ -22,6 +22,8 @@ public:
 
 
 	typedef enum _TildState { EMPTY, MONKEY, FIRE, INVALID } TildState;
+	typedef enum _ClickState { MONKEY_CLICK, FIREMONKEY, INITIAL_DIALOG, RESET_GAME } ClickState;
+
 	typedef struct { unsigned int x; unsigned int y; } GridPos;
 
     // Here's a difference. Method 'init' in cocos2d-x returns bool, instead of returning 'id' in cocos2d-iphone
@@ -32,12 +34,16 @@ public:
 
     // a selector callback
     void menuCloseCallback(CCObject* pSender);
+    void onFireManMonkeyClick( CCObject* pSender );
 
     //bool ccTouchBegan(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent);
     void ccTouchesEnded(cocos2d::CCSet* touches, cocos2d::CCEvent* event);
     //void ccTouchEnded(cocos2d::CCTouch *pTouch, cocos2d::CCEvent *pEvent);
 
     void draw();
+
+    void setClickState( MonkeyRush::ClickState state) { this->currentClickState = state; };
+    MonkeyRush::ClickState getClickState( ) { return this->currentClickState; };
 
     // implement the "static node()" method manually
     CREATE_FUNC(MonkeyRush);
@@ -61,6 +67,7 @@ protected:
 
     void _startTheGame();
     void _addNewMonkey( cocos2d::CCPoint positon );
+    void _extinguishFire( cocos2d::CCPoint positon );
     GridPos _Position2GridCell ( float x, float y );
     cocos2d::CCPoint _getCellCenter( GridPos cp );
     void _setCellState( GridPos cell, TildState state);
@@ -75,10 +82,14 @@ protected:
     void _resetGame();
 
 
-
+    ClickState currentClickState;
     TildState grid[GridWidth][GridHeight];
+    cocos2d::CCObject* gridReferences[GridWidth][GridHeight];
+
+    unsigned int nFireMonkeys;
 
     void _initGame();
+    void _initVariables();
     void _loadScene();
 };
 
